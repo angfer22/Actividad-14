@@ -1,0 +1,47 @@
+-----------------------------------------------------------------------------------------------------
+Reduce
+from pyspark import SparkContext
+sc = SparkContext("local", "Complex Reduce Example")
+sales_data = sc.parallelize([("apple", 10), ("banana", 20), ("apple", 15), ("banana", 5)])
+total_sales = sales_data.reduceByKey(lambda a, b: a + b)
+print(total_sales.collect())  # Salida: [('apple', 25), ('banana', 25)]
+-----------------------------------------------------------------------------------------------------
+Collect
+user_data = sc.parallelize([
+    {"name": "Alice", "age": 30},
+    {"name": "Bob", "age": 25},
+    {"name": "Charlie", "age": 35}
+])
+all_users = user_data.collect()
+for user in all_users:
+    print(user)  # Salida: {'name': 'Alice', 'age': 30}, etc.
+-----------------------------------------------------------------------------------------------------
+Count
+transaction_data = sc.parallelize([{"id": 1}, {"id": 2}, {"id": 3}, {"id": 4}])
+total_transactions = transaction_data.count()
+print(total_transactions)  # Salida: 4
+-----------------------------------------------------------------------------------------------------
+Take
+event_logs = sc.parallelize(["event1", "event2", "event3", "event4", "event5", "event6"])
+first_five_events = event_logs.take(5)
+print(first_five_events)  # Salida: ['event1', 'event2', 'event3', 'event4', 'event5']
+-----------------------------------------------------------------------------------------------------
+saveAsTextFile
+sales_results = sc.parallelize(["Total Sales: 100", "Total Products: 50"])
+sales_results.saveAsTextFile("sales_output.txt")
+-----------------------------------------------------------------------------------------------------
+Max y Min
+scores = sc.parallelize([88, 92, 79, 95, 85])
+max_score = scores.max()
+min_score = scores.min()
+print(f"Max: {max_score}, Min: {min_score}")  # Salida: Max: 95, Min: 79
+-----------------------------------------------------------------------------------------------------
+CountByKey
+product_sales = sc.parallelize([("apple", 1), ("banana", 1), ("apple", 1), ("orange", 1)])
+sales_count = product_sales.countByKey()
+print(sales_count)  # Salida: {'apple': 2, 'banana': 1, 'orange': 1}
+-----------------------------------------------------------------------------------------------------
+Foreach
+transaction_data = sc.parallelize([{"id": 1, "amount": 100}, {"id": 2, "amount": 200}])
+transaction_data.foreach(lambda x: print(f"Transaction ID: {x['id']}, Amount: {x['amount']}"))
+-----------------------------------------------------------------------------------------------------
