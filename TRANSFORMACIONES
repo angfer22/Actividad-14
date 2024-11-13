@@ -1,0 +1,109 @@
+-------------------------------------------------------------------------------------------------------------
+Map
+from pyspark import SparkContext
+sc = SparkContext("local", "Map Example")
+temperaturas_celsius = sc.parallelize([0, 10, 20, 30, 40])
+temperaturas_fahrenheit = temperaturas_celsius.map(lambda x: (x, (x * 9/5) + 32))
+print(temperaturas_fahrenheit.collect())  # [(0, 32.0), (10, 50.0), (20, 68.0), (30, 86.0), (40, 104.0)]
+-------------------------------------------------------------------------------------------------------------
+Filter
+clientes = sc.parallelize([("Juan", 25, "Madrid"),
+                           ("Ana", 35, "Barcelona"),
+                           ("Luis", 40, "Madrid"),
+                           ("Sofia", 29, "Madrid"),
+                           ("Carlos", 33, "Sevilla")])
+clientes_filtrados = clientes.filter(lambda x: x[1] > 30 and x[2] == "Madrid")
+print(clientes_filtrados.collect())  
+------------------------------------------------------------------------------------------------------------
+FlatMap
+documentos = sc.parallelize(["El rápido zorro",
+                             "salta sobre el perro perezoso",
+                             "y luego corre hacia la luna"])
+palabras = documentos.flatMap(lambda doc: doc.split(" "))
+print(palabras.collect())  
+------------------------------------------------------------------------------------------------------------
+Union
+estacion1 = sc.parallelize([25, 30, 35])
+estacion2 = sc.parallelize([20, 25, 28])
+temperaturas_union = estacion1.union(estacion2)
+print(temperaturas_union.collect())  # [25, 30, 35, 20, 25, 28]
+------------------------------------------------------------------------------------------------------------
+intersection
+productos_2023 = sc.parallelize(["Laptop", "Smartphone", "Tablet", "Monitor"])
+productos_2024 = sc.parallelize(["Smartphone", "Tablet", "Auriculares", "Teclado"])
+productos_comunes = productos_2023.intersection(productos_2024)
+print(productos_comunes.collect())  
+------------------------------------------------------------------------------------------------------------
+Distinct
+transacciones = sc.parallelize([("T001", 150), ("T002", 200), ("T001", 150), ("T003", 350)])
+transacciones_unicas = transacciones.distinct()
+print(transacciones_unicas.collect())  
+------------------------------------------------------------------------------------------------------------
+groupByKey
+from pyspark import SparkContext
+sc = SparkContext("local", "groupByKey Example")
+ventas = sc.parallelize([("Laptop", 2), 
+                         ("Smartphone", 5), 
+                         ("Tablet", 4), 
+                         ("Laptop", 3), 
+                         ("Smartphone", 2),
+                         ("Tablet", 1)])
+ventas_por_producto = ventas.groupByKey().mapValues(sum)
+print(ventas_por_producto.collect())  
+------------------------------------------------------------------------------------------------------------
+reduceByKey
+ventas = sc.parallelize([("Laptop", 2), 
+                         ("Smartphone", 5), 
+                         ("Tablet", 4), 
+                         ("Laptop", 3), 
+                         ("Smartphone", 2),
+                         ("Tablet", 1)])
+ventas_totales = ventas.reduceByKey(lambda x, y: x + y)
+print(ventas_totales.collect())  
+------------------------------------------------------------------------------------------------------------
+sortByKey
+productos = sc.parallelize([("Laptop", 2), 
+                            ("Smartphone", 5), 
+                            ("Tablet", 4), 
+                            ("Camera", 3), 
+                            ("Headphones", 2)])
+productos_ordenados = productos.sortByKey()
+print(productos_ordenados.collect())  
+------------------------------------------------------------------------------------------------------------
+join
+ventas = sc.parallelize([("Laptop", 2), 
+                         ("Smartphone", 5), 
+                         ("Tablet", 4), 
+                         ("Laptop", 3)])
+precios = sc.parallelize([("Laptop", 1200), 
+                         ("Smartphone", 800), 
+                         ("Tablet", 350)])
+ventas_con_precios = ventas.join(precios)
+ingreso_total = ventas_con_precios.map(lambda x: (x[0], x[1][0] * x[1][1]))
+print(ingreso_total.collect())  
+------------------------------------------------------------------------------------------------------------
+cogroup
+ventas = sc.parallelize([("Laptop", 2), 
+                         ("Smartphone", 5), 
+                         ("Tablet", 4), 
+                         ("Laptop", 3)])
+precios = sc.parallelize([("Laptop", 1200), 
+                         ("Smartphone", 800), 
+                         ("Tablet", 350)])
+ventas_y_precios = ventas.cogroup(precios)
+print(ventas_y_precios.collect())  
+------------------------------------------------------------------------------------------------------------
+coalesce
+ventas = sc.parallelize([("Laptop", 2), 
+                         ("Smartphone", 5), 
+                         ("Tablet", 4), 
+                         ("Laptop", 3)], 6)  # Con 6 particiones
+ventas_coalesced = ventas.coalesce(2)
+print("Número de particiones original:", ventas.getNumPartitions())  # 6
+print("Número de particiones después de coalesce:", ventas_coalesced.getNumPartitions())  # 2
+------------------------------------------------------------------------------------------------------------
+
+
+
+
+
